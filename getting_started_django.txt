@@ -1,0 +1,87 @@
+manage.py: gestiona el projecte a traves del terminal
+settings.py: arxiu de configuracion del projecte/apps
+url.py: script de configuracio de les url de les pagines
+wsgi.py: script de configuracio del projecte per la produccio
+
+1-Crear Projecte
+django-admin startproject nom_projecte
+
+2-Configuracio arxiu settings.py
+bbdd, idioma, etc
+
+3-Inicialitzar/sincronitzar bbdd
+python manage.py migrate
+NOTA:si hi han apps que sacaben de crear i aquestes apps requereixen un bbdd doncs django et dira que cal migrar, com al principi dun projecte, on tenim les apps per defecte:admin,auth,contentypes i sessions, que django et diu que si no es mihra poden haber-hi problemes amb aquestes apps. En canvi no et diu res de les apps:messages i staticfiles, ja que, son apps que no requereixen bbdd.
+
+APPS (Aplicacions internes que implementen funcionalitats especifiques)
+Per defecte, django te creades diferents apps que ajuden en diverses funcions:
+admin: gestiona el panell dadministrador
+auth: serveix per autenticar els usuaris
+contenttypes, sessions, messages, staticfiles (no ho se encara)
+
+4-Creacio d'Apps
+python manage.py startapp nom_app
+NOTA:Es generen molts fitxers, pero ara el que ens interessa es el fitxr views.py
+
+5-Creacio de la vista
+Ens anem al fitxer views i es aquest lencarregat de gestionar les vistes de lapp.
+Dins el fitxer views.py importem el metode HttpResponse, que es troba al mateix modul django.shortcuts. Aquest metode ens permet contestar a una peticcio Http i retornar un codi(per exemple un codi Html)
+Es una manera de introduir codi html a la brava HttpResponse("codi html") i llavors el veura.
+Ara he fet una vista, pero li haig de dir a Django a quina URL ha danar aquesta vista
+6-Creacio de la URL per la vista
+Fitxer urls.py de la carpeta del projecte principal. Seguir les instruccions que et marquen per a Function Views, ja que es la que utilitzarem. En el futur veurem daltres
+6.1.-Importo el fitxer views.py de la aplicacio (paquet) amb nom (p.ex core)
+from core import views
+6.2.-Crear un nou path(direccio url) dins la llista de urlpatterns que tenim a larxiu urls.py
+path('',views.home,name='home'),
+
+7-Crear enllaços a cada pagina dacces a totes les pagines del projecte (pots fer una base comu per totes)
+
+NOTA:Crear la vista directament amb larxiu views, posant codi html i llegintlo amb HttpResponse es practic per a ensenyar com funciona, pero no ens es massa practic si volem mostrar pagines dhtml,css3,javascript ven treballades. Per a fer-ho, treballarem amb els templates, que son arxius html, enlloc darxius python llegint html cru.
+
+8-Modificar arxiu views.py i fer que llegeixi el codi html desde un arxiu html (template) a traves de la metode render, enlloc del propi arxiu views.py mitjancant el metode HtmlResponse
+8.1.-Crear carpeta templates dins de la carpeta de la aplicacio (per exemple core). Crear una subcarpeta dins de templates amb el nom de la aplicacio(per a un millor ordre) a on posarem totes les plantilles de la aplicacio (les plantilles estan fetes en codi html)
+8.2.-Crees larxiu html amb la vista dessitjada i el guardes a la subarpeta dela carpeta templates
+8.3.-Enllaces la funcio on es troba el request del arxiu views.py amb la plantilla creada (html template)
+#def home(request):
+#    return(HttpResponse(html_base+"<h1>Pagina Principal</h1><h2>Portada</h2>"))
+#     return(render(request,"core/home.html"))
+NOTA:Si nomes ho deixem aqui django no detecta la ruta fins lhtml, per a fer-ho s'ha dafegir la aplicacio nova al arxiu settings.py
+8.4.-Afegir la nova aplicacio al arxiu settings.py per a que django pugui detectar les rutes a on es troben els templates (suposo que tambe per daltres coses), (hauria de mirar el per que de la disposicio de subcarpetes:templates->nom_app)
+'nom_app',
+
+9.-Si tenim codi repetit, com seria per exemple el menu de navegacio per accedir a les diferents pagines web, el millor es crear una plantilla base i cada plantilla especifica potcridar la base en qualsevol situacio i per tant aprofitar aquesta plantilla per totes les plantilles que vulguis.
+Per a fer-ho, generem un html base, amb tot el codi comu. Llavors, a alla a on volguem posar les parts especifiques de cada template que vulgui incloure el html base hi posem un template tag, que son tags de templates que permeten introduir llogica de programacio dins del html.Hi han molts templates tags a django, per exemple. Tambe haurem d'anotar amb el template que inclou el template plantilla, el tag del template plantilla, indicant quina es la part a afegir al template plantilla, es a dir, ens cal anotar el template tag al template plantilla (indicant la part daquest a on safegiran dades) i al template que incorpora el template plantilla (indicant quina part es la que safegeix al template plantilla)
+    {% block content %}{% endblock %}, que ens permet definir un bloc de contingut amb un nom. Es a dir que cada template plantilla pot posar el text que vulgui. La paraula content es pot canviar per la que es vulgui, es el nom duna variable
+    Per altra banda, per a que un template agafi com a plantilla un altra template, haurem de indicar-ho daquesta manera: 
+{% extends 'core/base.html' %}
+entenent que el template plantilla es diu base.html i es troba per defecte al directori projecte/core/templates/core
+
+10.-Modificacio URL dels templates. Fins ara hem anotat les url dels templates directamente amb les url en cru, pero, realment, des dels templates hauriem de cridar no als url en cru sino, directament al nom dels url definits al arxiu url.py de la carpeta principal del projecte.
+Per exemple
+Tenim definit aquest url al arciu urls.py
+path('about-me/',views.about,name='about-me'),
+la ruta en cru es:/about-me
+views.about indica a on es troba la vista a seleccionar (i de la vista al template, model,etc)
+name='about-me' es el nom amb que lem de cridar des del template tag url, que es la manera correcte.
+Es a dir desde un template el cridariem aixi:
+{% url 'about-me' %}
+D'aquesta manera encara que canvii la url real no la haurem de canviar a la resta de llocs nomes al arxiu urls.py
+
+11.- Unir front-end amb back-end.
+11.1.- Posar els template tags al front end. Com ja tinc la estructura creada amb les seccions dinamiques que vull, lunic que haig de fer es traslladar aquestes seccions al front-end, es a dir, template tags, etc.
+11.2.- Situar els arxius estatics del front end de cara a que quan la vista cridi als templates aquest puguin cridar als seus respectiis arxius estatics (css3, javascript, images,etc)
+    El problema es que el servidor de desenvolupament de django, aquest que estem executant amb manage.py runserver, no es capac de manegar arxius estatics, daixo sencarregaria engings o apache(o qualsevol altre servidor) en fase de desplegament de la app. Aixo no vol dir que en fase de debug no ho poguem fer, nomes que cal fer un parell de configuracions mes per a aconseguir que el servidor de desenvolupament de django sigui capac de servir aquesta mena de fitxers.Per fer-ho:
+    11.2.1.-Creem un subdirectori dins la app que estem treballant que es dira static. I seguint la llogica dels templates, dins aquest subdirectori static en crearem un altre amb el nom de la app (p.ex core)
+
+    ATENCIO!!! LLOGICA DELS DIRECTORIS TEMPLATES I STATIC:
+    Django recopila tots els subdirectoris dins de cada aplicacio que estan dins la carpeta templates i static, i els agrupa en una carpeta amb els mateixos noms (templates i static) i a dins de cadascuna estan totes les carpetes de cada app--->es per aixo que seguim aquesta estructura (core->templates-core)
+
+    11.2.2.-Afegim els subdirectoris que continguin els fitxers estatics (p.ex. css,js,img,etc), amb tots els fitxers estatics dins
+
+    11.2.3.-Ara em de dir-li al template que importi els fitxers estatics per a que els pugui carregar a la pagina web (si no nestem utilitzant ho haurem dafefir a cada temllate)
+    {% load static %}
+    Es posa al head (inici) just despres del title i abans dels links als fitxers estatics. Davant de cada url hem de posar (entre les cometes que segueixen href,style,src,etc)
+href="{% static 'core/...' %}"
+scr="{% static 'core/...' %}"
+style="background-image: url('{% static 'core/...' %}')"

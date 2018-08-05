@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block tittle %}{% endblock %} | Web Personal</title>
+</head>
+<body>
+    <!--Capcalera i Menu-->
+    <h1>Web Personal</h1>
+    
+    <ul>
+        <li><a href="{% url 'home' %}">Portada</a></li>
+        <li><a href="{% url 'about' %}">Referent a</a></li>
+        <li><a href="{% url 'portfolio' %}">Portafoli</a></li>
+        <li><a href="{% url 'contact' %}">Contacte</a></li>
+    </ul>
+    <!--Contingut-->
+    {% block content %}{% endblock %}
+</body>
+</html>
+
