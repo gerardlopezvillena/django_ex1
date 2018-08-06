@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <title>
-    {% block title %}{% endblock %} | Gerard Lopez Villena
+    {% block tittle %}{% endblock %} | Gerard Lopez Villena
     </title>
 
 
@@ -51,14 +51,13 @@
     </nav>
 
     <!-- Cabecera -->
-    <header class="masthead" style="background-image: url('{% static 'core/img/home-bg.jpg' %}')">
+    <header class="masthead" style="background-image: url('{% block background %}{% endblock %}')">
       <div class="overlay"></div>
       <div class="container">
         <div class="row">
           <div class="col-lg-8 col-md-10 mx-auto">
             <div class="site-heading">
-              <h1>Gerard López Villena</h1>
-              <span class="subheading">Biotecnòleg</span>
+              {% block headers %}{% endblock %}
             </div>
           </div>
         </div>
