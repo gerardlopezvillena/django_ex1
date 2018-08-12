@@ -4,8 +4,16 @@
 Respecte mi
 {% endblock %}
 
+{% block background %}{% load static %}{% static 'core/img/about-bg.jpg' %}{% endblock %}
+
+{% block headers %}
+<h>Gerard López Villena</h1>
+<span class="subheading">Biotecnòleg</span>
+{% endblock %}
+
 {% block content %}
 <h2>Respecte mi</h2>
 
 <p>Em dic Gerard Lopez Villena i soc Biotecnoleg</p>
 {% endblock %}
+
