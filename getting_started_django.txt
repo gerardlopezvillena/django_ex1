@@ -85,3 +85,9 @@ D'aquesta manera encara que canvii la url real no la haurem de canviar a la rest
 href="{% static 'core/...' %}"
 scr="{% static 'core/...' %}"
 style="background-image: url('{% static 'core/...' %}')"
+
+NOTA: {{request.path}} es una variable interna del template que si la poso a la brava en un template m'indicara el path de cada template, es a dir: /, /about-me/, /portfolio/, etc
+NOTA2: Exemple amb el template tag IF:
+{% if request.path != "/"}
+    <hr>
+{% endif %}

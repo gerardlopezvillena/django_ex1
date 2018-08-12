@@ -7,12 +7,18 @@ Portafoli
 {% block background %}{% load static %}{% static 'core/img/portfolio-bg.jpg' %}{% endblock %}
 
 {% block headers %}
-<h>Gerard López Villena</h1>
-<span class="subheading">Biotecnòleg</span>
+<h1>Gerard López Villena</h1>
+<span class="subheading">Portafoli</span>
 {% endblock %}
 
 {% block content %}
-<h2>Portfoli</h2>
+<div class="col-lg-3 col-md-4 offset-lg-1">
+    <img class="img-fluid avatar" src="{% static 'core/img/avatar.jpg' %}" alt="">
+</div>
+<div class="col-lg-7 col-md-8">
+    <h2 class="section-heading">Gerard López Villena</h2>
+    <p>Aixo es el portfoli, i no se ben be que s'hi posa</p>
+    <p>Continuo en .... lorem ipsum</p>
+</div>
 
-<p>Aixo es el portfoli, i no se ben be que s'hi posa</p>
 {% endblock %}
