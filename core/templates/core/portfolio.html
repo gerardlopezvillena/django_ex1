@@ -7,18 +7,32 @@ Portafoli
 {% block background %}{% load static %}{% static 'core/img/portfolio-bg.jpg' %}{% endblock %}
 
 {% block headers %}
-<h1>Gerard López Villena</h1>
-<span class="subheading">Portafoli</span>
+<h1>Portafoli</h1>
+<span class="subheading">Currículum</span>
 {% endblock %}
 
 {% block content %}
-<div class="col-lg-3 col-md-4 offset-lg-1">
-    <img class="img-fluid avatar" src="{% static 'core/img/avatar.jpg' %}" alt="">
+<!-- Proyecto -->
+<div class="row project">    	
+    <div class="col-lg-3 col-md-4 offset-lg-1">
+        <img class="img-fluid" src="{% static 'core/img/about-bg.jpg' %}" alt="">
+    </div>
+    <div class="col-lg-7 col-md-8">
+        <h2 class="section-heading title">Segon projecte</h2>     
+        <p>As we got further and further away, it [the Earth] diminished in size. Finally it shrank to the size of a marble, the most beautiful you can imagine. That beautiful, warm....</p>
+        <p><a href="http://google.com">Mes informació</a></p>
+    </div>
 </div>
-<div class="col-lg-7 col-md-8">
-    <h2 class="section-heading">Gerard López Villena</h2>
-    <p>Aixo es el portfoli, i no se ben be que s'hi posa</p>
-    <p>Continuo en .... lorem ipsum</p>
+<!-- Proyecto -->
+<div class="row project">    	
+    <div class="col-lg-3 col-md-4 offset-lg-1">
+        <img class="img-fluid" src="{% static 'core/img/home-bg.jpg' %}" alt="">
+    </div>
+    <div class="col-lg-7 col-md-8">
+            <h2 class="section-heading title">Primer projecte</h2>     
+        <p>As we got further and further away, it [the Earth] diminished in size. Finally it shrank to the size of a marble, the most beautiful you can imagine. That beautiful, warm....</p>
+        <p><a href="http://google.com">Mes informació</a></p>
+    </div>
 </div>
 
 {% endblock %}
