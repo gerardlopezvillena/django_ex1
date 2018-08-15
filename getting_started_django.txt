@@ -91,3 +91,11 @@ NOTA2: Exemple amb el template tag IF:
 {% if request.path != "/"}
     <hr>
 {% endif %}
+
+12.- MODELS: A Django hi ha un potent sistema de mapejat ORM (Model Objecte Relacional), aixo vol dir que si seguim les pautes de Django, podem mapejar objectes a la base de dades, de manera que quan es genera una instancia d'una classe, aquesta queda guardada a la base de dades automaticament en forma de registres. Nomes això, sino que si fem modificacions d'aquesta instancia aquestes modificacions queden guardades a la base de dades automaticament. Les Classes que maneguen aquests objectes persistents s'anomenen MODELS. Son Classes enllaçades a la base de dades. Nomes cal que quan creem una classe dins el fitxer models.py, que es on tindré tots els models, aquestes classes heredin: class Nom_Model(models.Model):, per a enllaçar tots els objectes creats a la base de dades a partir d'aquesta classe. Aquesta classe representarà una TAULA dins de la BASE DE DADES, cada ATRIBUT d'aquesta CLASSE sera una COLUMNA de la TAULA de la BASE DE DADES. Cada atribut dins de la classe pot ser definit com una cadena de text, un sencer,etc, i ho definirem a partir de la clase heretada models.Model.
+    12.1.- Crear o utilitzar una app (python manage.py startapp nom_app)
+    12.2.- Definir un model. Al fitxer models.py de la app, aquest fitxer es el fitxer a on anotarem els nostres models (que recordem que son classes que maneguen(creen,editen,etc) els objectes persistents guardats a la base de dades).
+    12.3.- En el cas que la app sigui de nova creacio, afegir-la al arxiu settings.py de la carpeta principal
+    12.4.- Fer una migracio. Quan s'ha creat un nou model per a la base de dades, cal informar a django d'aquests canvis i enllaçar el nou model a la base de dades. Per a fer-ho:
+        12.4.1.- Crear el fitxer de migracio dels models a enllaçar a la base de dades (es crea un fitxer que alhora servira com a backup per a recuperar un estadi anterior). Per a fer-ho: python manage.py makemigrations nom_app
+        12.4.2.- Aplicar aquesta migracio a la base de dades. Per a fer-ho: python manage.py migrate nom_app
