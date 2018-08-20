@@ -99,3 +99,122 @@ NOTA2: Exemple amb el template tag IF:
     12.4.- Fer una migracio. Quan s'ha creat un nou model per a la base de dades, cal informar a django d'aquests canvis i enllaçar el nou model a la base de dades. Per a fer-ho:
         12.4.1.- Crear el fitxer de migracio dels models a enllaçar a la base de dades (es crea un fitxer que alhora servira com a backup per a recuperar un estadi anterior). Per a fer-ho: python manage.py makemigrations nom_app
         12.4.2.- Aplicar aquesta migracio a la base de dades. Per a fer-ho: python manage.py migrate nom_app
+
+NOTA: Una vegada esta creat un model, aquesta bbdd es pot manegar a traves de diferents templates i views, i llògicament, també es pot utilitzar el panell d'administracio per a poder-ho manegar.
+13.- ASSOCIAR MODEL BBDD A TEMPLATE/VIEW
+    13.1.- TEMPLATE/VIEW PANELL ADMINISTRADOR
+        13.1.2.- Donar d'alta usuari administrador.
+            Executa: python manage.py createsuperuser
+        13.1.2.- Accedir al panell de control del administrador
+            Com veiem al arxiu url.py de la carpeta del projecte general veiem que, a mes de tenir configurades unes url amb les nostres vistes, tenim una url creada per defecte que es troba a /admin/. Llogicament podem canviar-ho per qualsevol altre, pero ara com ara treballarem sense fer-ho(i probablement no ho canviarem mai)
+        13.1.3.- Afegir models al panell d'administrador
+            A cada app creada hi ha un fitxer admin.py on hem d'afegir tots els models creats que volem que siguin gestionats des del panell d'administracio.
+            Per a fer-ho, hem de fer dues coses:
+                a) Dins el fitxer admin.py importem el model. Com que el fitxer de models de la propia app esta en el mateix directori doncs ho podem fer aixi:
+                    from .models import nom_model
+                b) Registrem el model dins el panell administrador.
+                    Per a fer-ho, dins del propi fitxer models.py de la app on es troba el model a gestionar al panell d'administrador, afegim la seguent instruccio:
+                        admin.site.register(nom_model)
+
+14.- PERSONALITZAR EL PANELL D'ADMINISTRADOR
+    Si entrem al panell d'administrador, i volem afegir una imatge a algun registre de la nostra bbdd, de la nostra app veiem que encara que el seleccionem ens surt un error. A mes, al introduir un nom del registre ens surt un nom per defecte diferent.
+    En el cas del nom aixo es llogic ja que django no te cap manera de saber quin és el nom a no ser que li especifiquem. Per a definir el nom per defecte de la app dins el panell d'administrador anem a: directori_app/admin.py i veiem que (en aquest cas el nom de la app es Portfolio):
+
+class PortfolioConfig(AppConfig):
+    name = 'portfolio'
+
+    La variable name indica el nom de la app per defecte que surt a django que es llogicament aquell nom que hem donat alhora de crear la app, es a dir, el nom del directori de la app, pero si volem canviar-ho, hem d'utilitzar un camp extes (una variable heretada de la classe AppConfig) que s'anomena verbose_name, que el que fa es posar un nom públic a la nostra app.
+
+class PortfolioConfig(AppConfig):
+    name = 'portfolio'
+    verbose_name= 'Portafoli'
+
+    Quan fem això estem afegint una configuració extesa a django, que per defecte no es fa servir. Per tant, hem de dir-li a django que em d'utilitzar aquesta configuració. Per a fer-ho hem de modificar l'arxiu del directori del projecte principal settings.py i al lloc on tenim anotades les aplicacions, enlloc de posar el nom de la app (en el cas d'exemple portfolio) haurem d'anotar la ruta a on es troba la classe de configuracio on tenim les modificacions. En el cas d'exemple seria 'portfolio.apps.PortfolioConfig'
+    Per tant, l'arxiu settings.py quedaria aixi:
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'core',
+    'portfolio.apps.PortfolioConfig',
+]
+
+    Ens passa el mateix amb el nom dels models de la app. Es a dir, agafa el nom de la classe del model. El que passa es que per conveni aquests noms s'haurien de posar en angles, com la resta de classes, funcions etc d'un programa, pero en canvi de cara al usuari ho hauria de veure en la seva llengua. En el cas anterior, per a fer-ho hem modificat un arxiu de configuracio del panell d'administrador associat a la app i despres indicant el canvi al arxiu settings.py. Per a modificar els noms dels models que surten per defecte al panell d'administrador, hem d'afegir una subclasse dins cada classe dels models inclossos a la app, on s'anotin les diferents metadades descriure. en aquest cas quedaria aixi:
+
+class Project(models.Model):
+    title=models.CharField(max_length=200)
+    description=models.TextField()
+    image=models.ImageField()
+    created=models.DateTimeField(auto_now_add=True) #al atribut es guarda la data de creacio del objecte de manera automatica
+    updated=models.DateTimeField(auto_now=True) #al atribut es guarda la data de la ultima modificacio del object
+
+    class Meta:
+        verbose_name="projecte"
+        verbose_name_plural="projectes" #si no especifiquem aquesta variable, per defecte afegeix una S al nom definit (per defecte o al verbose_name)
+ 
+    Dins d'aquesta subclasse es poden afegir altres dades de configuracio de la visualitzacio del model, com per exemple la ordenacio de cada registre, com es poden ordenar per diversos camps alhora, la variable es una llista on anotes l'ordre d'ordeacio de cada camp, en el cas exemple ho ordenarem per data de creacio:
+
+    class Meta:
+        verbose_name="projecte"
+        verbose_name_plural="projectes" #si no especifiquem aquesta variable, per defecte afegeix una S al nom definit (per defecte o al verbose_name)
+        ordering=["-created"] # posem un guio - per indicar que el ordre ha de ser a la inversa, en aquest cas no volem que sigui del registre mes antic al mes nou sino al contrari, del mes nou al mes antic
+
+    Per altra banda, el nom per defecte de cada registre no esta definit i per defecte t'anota el nom del model amb la paraula object (ja que llogicament es un objecte) i amb un numero. Per a dir-li a django que utilitzi lgun dels atributs de la classe del model, hem d'utilitzar el classic metode especial __str__. Es a dir, en el cas exemple hi han molts atributs i utilitzarem l'atribut title.
+
+    def __str__(self):
+        return(self.title)
+
+    Finalment, cadascun dels atributs del model, per llogica de programacio estan en angles. Django, per defecte agafa els noms dels atributs com a noms publics per a mostrar directamentcom en els casos anteriors. Per a modificar-ho, puc afegir l'atribut verbose_name dins la definicio de cada atribut, especificant el nom public de cada atribut del model. És a dir, en el cas exemple:
+
+class Project(models.Model):
+    title=models.CharField(max_length=200,verbose_name="Títol")
+    description=models.TextField(verbose_name="Descripció")
+    image=models.ImageField(verbose_name="Imatge")
+    created=models.DateTimeField(auto_now_add=True,verbose_name="Data Creació") #al atribut es guarda la data de creacio del objecte de manera automatica
+    updated=models.DateTimeField(auto_now=True,verbose_name="Data Modificació") #al atribut es guarda la data de la ultima modificacio del object
+
+    Per altra banda, els camps de data i hora automatitzats, que s'autoactualitzen cada moment de manera automàtica, no apareixen al panell del administrador. Sembla ser que es l'atribut auto_now el que fa que no apareguin. Això es degut a que django per defecte no els fa apareixer per a que no puguin ser modificats, ja que son camps que s'actualitzen automaticament. Però podem mostrar-lo com a camps de Sols Lectura.
+    Per a fer-ho hem d'extendre la configuració base del administrador. I fem el següent:
+        a) Anem al fitxer admin.py de la app.
+        b) Creem una classe abans de registrar el model. El nom pot ser el que volguem, però per conveni s'utilitza el següent nom_modelAdmin. I fem que heredi d'admin ModelAdmin. És a dir: class nom_modelAdmin(admin.ModelAdmin):
+        c) Ara redefinim un atribut heretat de admin.ModelAdmin que es diu: readonly_fields. Que es una tupla. En el nostre exemple posarem: readonly_fields=("created","updated")
+        d) Finalment, hem d'afegir la configuracio extesa del administrador en el registre d0aquesta. És a dit, abans teniem admin.site.register(nom_model) i ara anotarem admin.site.regiter(nom_model,nom_modelAdmin)
+
+        En el nostre exemple, l'arxiu nom_app/admiadmin.py quedaria aixi
+
+from django.contrib import admin
+from .models import Project
+
+class ProjectAdmin(admin.ModelAdmin):
+    readonly_fields=("created","updated")
+
+# Register your models here.
+admin.site.register(Project,ProjectAdmin)
+
+    Ara sí, finalment, ens trobem que el fitxer que seleccionem dins el registre, ens surt un error.
+    Per defecte, django no serveix fitxers, a mes, quan selecciones un fitxer per defecte te' guarda a la arrel del projecte, cosa que es molt perillosa. ELS FITXERS QUE PUGEN ELS USUARIS SON FITXERS MULTIMEDIA, i aquests haurien d'estar en una carpeta especifica per això.
+
+    Per a fer-ho tot:
+        a) Creem una carpeta que anomenarem media dins la carpeta principal del projecte (és a dir, on trobem l'arxiu manage.py.
+        b) Ara hem de indicar a django que hem creat un directori media a on volem que s'emmagatzemin tots els fitxers media dels usuaris del projecte. Per a fer-ho anem al fitxer settings.py del directori del projecte. I al final de tot, despres de la declaració de la variable del URL dels fitxers estatics, definirem MANUALMENT la configuració dels fitxers media, començant per la URL. Definirem una variable: MEDIA_URL='/media/' # indiquem la direccio publica, MEDIA_ROOT=os.path.join(BASE_DIR,"media") # indiquem la ruta completa on django ha de trobar el fitxers. Això fa que tots els fitxers pujats pels usuaris es guardin al directori creat per nosaltres anomenat media, pero, necesitem mes organització, ja que hi hauran molts models, i per tant, molts fitxers. Per a dir-li a django que els fitxers pujats a una base de dades gestionada per un model concret, els afegirem a una carpeta creada dins el directori media pero a una carpeta amb el nom del model, i que es creara automaticament. És a dir: media/model/fitxer1. Per a fer-ho, anem a la carpeta de la app on tenim el model que manega la base de dades i al atribut que gestioni el fitxer (en el cas del exemple, image), li afegim un atribut, upload_to='nom_app' (o el nom que volguem). És a dir, el model exemple quedaria de la seguent manera:
+
+class Project(models.Model):
+    title=models.CharField(max_length=200,verbose_name="Títol")
+    description=models.TextField(verbose_name="Descripció")
+    image=models.ImageField(verbose_name="Imatge",upload_to="projects")
+    created=models.DateTimeField(auto_now_add=True,verbose_name="Data de Creació") #al atribut es guarda la data de creacio del objecte de manera automatica
+    updated=models.DateTimeField(auto_now=True,verbose_name="Data d'Edició") #al atribut es guarda la data de la ultima modificacio del object
+
+    class Meta:
+        verbose_name="projecte"
+        verbose_name_plural="projectes" #si no especifiquem aquesta variable, per defecte afegeix una S al nom definit (per defecte o al verbose_name)
+        ordering=["-created"] # posem un guio - per indicar que el ordre ha de ser a la inversa, en aquest cas no volem que sigui del registre mes antic al mes nou sino al contrari, del mes nou al mes antic
+
+    def __str__(self):
+        return(self.title)
+
+
