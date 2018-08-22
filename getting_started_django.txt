@@ -113,12 +113,12 @@ NOTA: Una vegada esta creat un model, aquesta bbdd es pot manegar a traves de di
                 a) Dins el fitxer admin.py importem el model. Com que el fitxer de models de la propia app esta en el mateix directori doncs ho podem fer aixi:
                     from .models import nom_model
                 b) Registrem el model dins el panell administrador.
-                    Per a fer-ho, dins del propi fitxer models.py de la app on es troba el model a gestionar al panell d'administrador, afegim la seguent instruccio:
+                    Per a fer-ho, dins del propi fitxer admin.py de la app on es troba el model a gestionar al panell d'administrador, afegim la seguent instruccio:
                         admin.site.register(nom_model)
 
 14.- PERSONALITZAR EL PANELL D'ADMINISTRADOR
     Si entrem al panell d'administrador, i volem afegir una imatge a algun registre de la nostra bbdd, de la nostra app veiem que encara que el seleccionem ens surt un error. A mes, al introduir un nom del registre ens surt un nom per defecte diferent.
-    En el cas del nom aixo es llogic ja que django no te cap manera de saber quin és el nom a no ser que li especifiquem. Per a definir el nom per defecte de la app dins el panell d'administrador anem a: directori_app/admin.py i veiem que (en aquest cas el nom de la app es Portfolio):
+    En el cas del nom aixo es llogic ja que django no te cap manera de saber quin és el nom a no ser que li especifiquem. Per a definir el nom per defecte de la app dins el panell d'administrador anem a: directori_app/apps.py i veiem que (en aquest cas el nom de la app es Portfolio):
 
 class PortfolioConfig(AppConfig):
     name = 'portfolio'
@@ -196,10 +196,10 @@ class ProjectAdmin(admin.ModelAdmin):
 admin.site.register(Project,ProjectAdmin)
 
     Ara sí, finalment, ens trobem que el fitxer que seleccionem dins el registre, ens surt un error.
-    Per defecte, django no serveix fitxers, a mes, quan selecciones un fitxer per defecte te' guarda a la arrel del projecte, cosa que es molt perillosa. ELS FITXERS QUE PUGEN ELS USUARIS SON FITXERS MULTIMEDIA, i aquests haurien d'estar en una carpeta especifica per això.
+    Per defecte, django no serveix fitxers, a mes, quan selecciones un fitxer per defecte te'n guarda a la arrel del projecte, cosa que es molt perillosa. ELS FITXERS QUE PUGEN ELS USUARIS SON FITXERS MULTIMEDIA, i aquests haurien d'estar en una carpeta especifica per això.
 
     Per a fer-ho tot:
-        a) Creem una carpeta que anomenarem media dins la carpeta principal del projecte (és a dir, on trobem l'arxiu manage.py.
+        a) Creem una carpeta que anomenarem media dins la carpeta principal del projecte (és a dir, on trobem l'arxiu manage.py).
         b) Ara hem de indicar a django que hem creat un directori media a on volem que s'emmagatzemin tots els fitxers media dels usuaris del projecte. Per a fer-ho anem al fitxer settings.py del directori del projecte. I al final de tot, despres de la declaració de la variable del URL dels fitxers estatics, definirem MANUALMENT la configuració dels fitxers media, començant per la URL. Definirem una variable: MEDIA_URL='/media/' # indiquem la direccio publica, MEDIA_ROOT=os.path.join(BASE_DIR,"media") # indiquem la ruta completa on django ha de trobar el fitxers. Això fa que tots els fitxers pujats pels usuaris es guardin al directori creat per nosaltres anomenat media, pero, necesitem mes organització, ja que hi hauran molts models, i per tant, molts fitxers. Per a dir-li a django que els fitxers pujats a una base de dades gestionada per un model concret, els afegirem a una carpeta creada dins el directori media pero a una carpeta amb el nom del model, i que es creara automaticament. És a dir: media/model/fitxer1. Per a fer-ho, anem a la carpeta de la app on tenim el model que manega la base de dades i al atribut que gestioni el fitxer (en el cas del exemple, image), li afegim un atribut, upload_to='nom_app' (o el nom que volguem). És a dir, el model exemple quedaria de la seguent manera:
 
 class Project(models.Model):
@@ -217,4 +217,23 @@ class Project(models.Model):
     def __str__(self):
         return(self.title)
 
+    NOTA INFORMATIVA SOBRE SERVIR FITXERS ESTATICS I FITXERS MEDIA
+    Per a servir els fitxers estatics i els fitxers media, hem de configurar l'arxiu settings.py de la nostra carpeta del projecte:
+
+    MEDIA_ROOT es la ruta absoluta al direcotri que contindra els nostres fitxers media. Per exemple, MEDIA_ROOT = "/User/Timmy/Sites/Pho/root/media/".
+    MEDIA_URL aquesta es la ruta relativa a la URL del navegador que sera utilitzada quan volguem accedir als fitxers media des del navegador. Per exemple, MEDIA_URL = "media/"
+    STATIC_ROOT = a MEDIA_ROOT
+    STATIC_URL = a MEDIA_URL
+
+    Ara ja tenim ordenats els nostres fitxers multimedia, pero continuem sense poder fer que django els serveixi. Per a fer-ho hem de fer el següent:
+        a) Importem l'arxiu settings.py de la carpeta del projecte al fitxer urls.py tambe de la carpeta del projecte. Ho fem aixi: from django.conf import settings
+        b) Ara ja podem preguntar dins del propi fitxer urls.py de la carpeta del projecte si al fitxer settings.py de la carpeta del projecte la variable DEBUG esta a TRUE o no. Es a dir, posem al fitxer urls.py el següent:
+
+if settings.DEBUG:
+    from django.conf.urls.static import static #aixo ens permetra servir fitxers estatics
+    # Ara li haurem de dir a django (desde el fitxer urls.py que si algu vol fa un request a la ruta /projecte/media/.../nom_fitxer doncs que li permeti accedir. Ho fem aixi:
+    urlpatterns += static(setting.URL_MEDIA, document_root=setting.MEDIA_ROOT)
+
+    És a dir, estem servint els fitxers media com si fossin estatics, per a efectes pràctics és el mateix. Això és un petit truc per a poder servir fitxers media en entorn DEBUG=True
+    NOTA: AIXÒ NOMÉS SERVEIX FITXERS MEDIA EN ENTORN DEBUG
 
