@@ -19,10 +19,6 @@ def about(request):
 #    return(HttpResponse(html_base+"<h1>Hola Django</h1><h2>Em dic Gerard i soc biotecnoleg</h2>"))
      return(render(request,"core/about.html"))
 
-def portfolio(request):
-#    return(HttpResponse(html_base+"<h1>Portafoli</h1><h2>Aixo es el portafoli</h2>"))
-     return(render(request,"core/portfolio.html"))
-
 def contact(request):
 #    return(HttpResponse(html_base+"<h1>Contacte</h1><h2>Informacio de contacte</h2>"))
      return(render(request,"core/contact.html"))
